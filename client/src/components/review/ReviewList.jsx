@@ -22,7 +22,7 @@ export default function ReviewList({
 
   return (
     <div>
-      <div className={`grid items-start gap-5 ${columns}`}>
+      <div className={`grid gap-5 ${columns}`}>
         {reviews.map((r) => <ReviewCard key={r.id} review={r} showRoad={showRoad} />)}
       </div>
       {infinite && (

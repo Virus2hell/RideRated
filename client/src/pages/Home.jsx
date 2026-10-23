@@ -116,7 +116,7 @@ export default function Home() {
           title="Latest reviews"
           action={<Link to="/feed" className="text-sm font-semibold text-brand-400 hover:underline">See all →</Link>}
         />
-        <ReviewList filters={{}} limit={6} infinite={false} />
+        <ReviewList filters={{}} limit={9} infinite={false} />
       </section>
 
       {/* CTA */}

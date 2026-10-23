@@ -1,10 +1,22 @@
+import { useState } from 'react';
 import { mediaUrl } from '../../lib/api';
 
-// Profile photo, or the rider's initials on an orange background.
+// Profile photo, or the rider's initials on an orange background
+// (also used if the photo file is missing, so you never see a broken image).
 // size can include a text size for the initials, e.g. "size-24 text-2xl".
 export default function Avatar({ user, size = 'size-9' }) {
-  if (user?.avatar_url) {
-    return <img src={mediaUrl(user.avatar_url)} alt="" className={`${size} rounded-full object-cover`} />;
+  const [failedUrl, setFailedUrl] = useState(null);
+  const url = user?.avatar_url;
+
+  if (url && url !== failedUrl) {
+    return (
+      <img
+        src={url.startsWith('blob:') ? url : mediaUrl(url)}
+        alt=""
+        className={`${size} shrink-0 rounded-full object-cover`}
+        onError={() => setFailedUrl(url)}
+      />
+    );
   }
   const initials = (user?.display_name ?? '?')
     .split(' ')
