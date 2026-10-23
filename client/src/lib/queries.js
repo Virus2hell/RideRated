@@ -68,11 +68,13 @@ export function usePost(id) {
   return useQuery({ queryKey: ['post', id], queryFn: () => api.get(`/posts/${id}`).then((r) => r.data.post), enabled: !!id });
 }
 
-// Search riders by username or name (empty = most followed riders)
+// Search riders by username or name (empty = most followed riders). Loads 21 at a time.
 export function useUserSearch(q) {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ['users', q],
-    queryFn: () => api.get('/users', { params: q ? { q } : {} }).then((r) => r.data.users),
+    queryFn: ({ pageParam }) => api.get('/users', { params: { q: q || undefined, offset: pageParam } }).then((r) => r.data),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => lastPage.nextOffset ?? undefined,
     placeholderData: (prev) => prev,
   });
 }

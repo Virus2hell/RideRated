@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { usePosts } from '../../lib/queries';
 import SafeImage from '../ui/SafeImage';
 import Spinner from '../ui/Spinner';
+import InfiniteScroll from '../ui/InfiniteScroll';
 import PostModal from './PostModal';
 import NewPostModal from './NewPostModal';
 import { HeartIcon, ImagesIcon, PlusIcon } from '../ui/Icons';
@@ -40,13 +41,7 @@ export default function PostGrid({ username, isMe }) {
         </div>
       )}
 
-      {hasNextPage && (
-        <div className="mt-6 text-center">
-          <button onClick={() => fetchNextPage()} disabled={isFetchingNextPage} className="btn-ghost">
-            {isFetchingNextPage ? 'Loading…' : 'Load more'}
-          </button>
-        </div>
-      )}
+      <InfiniteScroll hasNextPage={hasNextPage} isFetchingNextPage={isFetchingNextPage} fetchNextPage={fetchNextPage} />
 
       {open && <PostModal key={open.id} post={open} onClose={() => setOpenId(null)} />}
       {creating && <NewPostModal onClose={() => setCreating(false)} />}

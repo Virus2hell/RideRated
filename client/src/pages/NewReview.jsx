@@ -19,12 +19,17 @@ const FIELD_LABELS = {
 };
 const today = new Date().toISOString().slice(0, 10);
 
-function Section({ n, title, children }) {
+function Section({ n, title, required = false, children }) {
   return (
     <section className="card p-6">
       <h2 className="mb-5 flex items-center gap-3 font-display text-3xl tracking-wide">
         <span className="grid size-8 place-items-center rounded-full bg-brand-600 font-sans text-sm font-bold">{n}</span>
         {title}
+        {required ? (
+          <span className="text-red-500" aria-label="required">*</span>
+        ) : (
+          <span className="font-sans text-sm font-normal tracking-normal text-zinc-500">(optional)</span>
+        )}
       </h2>
       {children}
     </section>
@@ -101,22 +106,24 @@ export default function NewReview() {
     <div className="mx-auto max-w-3xl px-4 py-8">
       <h1 className="font-display text-6xl leading-none tracking-wide">Rate a road</h1>
       <p className="mt-1 text-zinc-400">Honest reviews keep riders safe. Tell it like it is.</p>
+      <p className="mt-3 text-sm text-zinc-500">Fields marked <span className="text-red-500">*</span> are required. Everything else is optional.</p>
 
       <form onSubmit={onSubmit} className="mt-8 space-y-6">
-        <Section n="1" title="Which road?">
+        <Section n="1" title="Which road?" required>
           <RoadPicker selected={road} onSelect={setRoad} newRoad={newRoad} setNewRoad={setNewRoad} errors={errors} />
         </Section>
 
-        <Section n="2" title="Rate it">
+        <Section n="2" title="Rate it" required>
           <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl bg-zinc-950/60 p-4">
             <div>
-              <p className="font-semibold">Overall <span className="text-brand-500">*</span></p>
+              <p className="font-semibold">Overall rating <span className="text-red-500">*</span></p>
               <p className="text-xs text-zinc-500">Would you ride it again?</p>
             </div>
             <StarInput value={form.ratingOverall} onChange={set('ratingOverall')} size="size-9" allowClear={false} />
           </div>
           {errors.ratingOverall && <p className="mt-2 text-sm text-red-400">{errors.ratingOverall[0]}</p>}
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <p className="mt-5 text-sm text-zinc-400">Rate the details <span className="text-zinc-500">(optional)</span></p>
+          <div className="mt-3 grid gap-4 sm:grid-cols-2">
             {RATING_CATEGORIES.map((c) => {
               const key = `rating${c.key[0].toUpperCase()}${c.key.slice(1)}`;
               return (
@@ -132,14 +139,14 @@ export default function NewReview() {
           </div>
         </Section>
 
-        <Section n="3" title="Tell the story">
+        <Section n="3" title="Tell the story" required>
           <div className="space-y-4">
             <FormField label="Title" placeholder="e.g. Monsoon heaven, but watch the wet patches" value={form.title} onChange={(e) => set('title')(e.target.value)} error={errors.title?.[0]} maxLength={120} required />
             <FormField as="textarea" rows={6} label="Your review" placeholder="Road condition, best time to go, food stops, fuel, anything riders should know…" value={form.body} onChange={(e) => set('body')(e.target.value)} error={errors.body?.[0]} required />
             <div className="grid gap-4 sm:grid-cols-2">
-              <FormField type="date" label="When did you ride it?" max={today} value={form.riddenOn} onChange={(e) => set('riddenOn')(e.target.value)} hint="Road conditions change, so dates help." />
+              <FormField type="date" optional label="When did you ride it?" max={today} value={form.riddenOn} onChange={(e) => set('riddenOn')(e.target.value)} hint="Road conditions change, so dates help." />
               <label className="block">
-                <span className="mb-1.5 block text-sm font-medium text-zinc-300">Best season to ride</span>
+                <span className="mb-1.5 block text-sm font-medium text-zinc-300">Best season to ride <span className="font-normal text-zinc-500">(optional)</span></span>
                 <select className="input" value={form.bestSeason} onChange={(e) => set('bestSeason')(e.target.value)}>
                   <option value="">Not sure</option>
                   {Object.entries(SEASONS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
@@ -148,7 +155,7 @@ export default function NewReview() {
             </div>
             <div>
               <p className="mb-2 text-sm font-medium text-zinc-300">
-                Tags <span className="text-zinc-500">(up to 6 · green = good, red = warning)</span>
+                Tags <span className="text-zinc-500">(optional · up to 6 · green = good, red = warning)</span>
               </p>
               <TagInput value={form.tags} onChange={set('tags')} />
             </div>

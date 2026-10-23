@@ -113,6 +113,10 @@ export default function RoadPicker({ selected, onSelect, newRoad, setNewRoad, er
         )}
       </div>
 
+      <p className="-mt-2 text-xs text-zinc-500">
+        Pick a road from search, <b className="text-zinc-400">or</b> drop a pin below (PIN code helps) and type the road name.
+      </p>
+
       <div className="flex items-center gap-3 text-xs uppercase tracking-widest text-zinc-500">
         <span className="h-px flex-1 bg-zinc-800" /> or find it by PIN code <span className="h-px flex-1 bg-zinc-800" />
       </div>
@@ -121,6 +125,7 @@ export default function RoadPicker({ selected, onSelect, newRoad, setNewRoad, er
       <div className="max-w-xs">
         <FormField
           label="PIN code"
+          optional
           inputMode="numeric"
           maxLength={6}
           placeholder="e.g. 411038"

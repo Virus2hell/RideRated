@@ -97,9 +97,14 @@ export const removeAvatar = removeImage('avatar_url');
 export const updateBanner = setImage('banner_url');
 export const removeBanner = removeImage('banner_url');
 
-// GET /api/users?q=   (search riders by username or name; no q = most active riders)
+// GET /api/users?q=&offset=   (search riders by username or name; no q = most active riders)
+// Offset pagination (20 at a time) because results are ranked by relevance, not by date.
+const SEARCH_PAGE = 21; // 21 per page = 7 rows of 3 cards
+
 export async function searchUsers(req, res) {
-  const { q } = z.object({ q: z.string().trim().max(50).optional() }).parse(req.query);
+  const { q, offset } = z
+    .object({ q: z.string().trim().max(50).optional(), offset: z.coerce.number().int().min(0).max(5000).default(0) })
+    .parse(req.query);
   const term = q?.replace(/^@/, '');
   const { rows } = await query(
     `SELECT u.id, u.username, u.display_name, u.avatar_url, u.city, u.bio,
@@ -112,11 +117,13 @@ export async function searchUsers(req, res) {
      ORDER BY
        CASE WHEN $2::text IS NOT NULL AND lower(u.username) = lower($2) THEN 0      -- exact username first
             WHEN $2::text IS NOT NULL AND u.username ILIKE $2 || '%' THEN 1 ELSE 2 END, -- then "starts with"
-       follower_count DESC, review_count DESC, u.created_at DESC
-     LIMIT 20`,
-    [req.user?.id ?? null, term || null],
+       follower_count DESC, review_count DESC, u.created_at DESC,
+       u.id -- tie-breaker so pages never repeat or skip a rider
+     LIMIT $3 OFFSET $4`,
+    [req.user?.id ?? null, term || null, SEARCH_PAGE + 1, offset],
   );
-  res.json({ users: rows });
+  const hasMore = rows.length > SEARCH_PAGE;
+  res.json({ users: rows.slice(0, SEARCH_PAGE), nextOffset: hasMore ? offset + SEARCH_PAGE : null });
 }
 
 // ---------- Follows ----------

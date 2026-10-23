@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
-import { mediaUrl } from '../../lib/api';
 import { timeAgo } from '../../lib/format';
 import Avatar from '../ui/Avatar';
+import SafeImage from '../ui/SafeImage';
 import UserLink from '../ui/UserLink';
 import StarRating from '../ui/StarRating';
 import TagChip from '../ui/TagChip';
@@ -16,7 +16,7 @@ export default function ReviewCard({ review, showRoad = true }) {
       <Link to={`/reviews/${review.id}`} className="block">
         {cover && (
           <div className="relative aspect-[16/9] overflow-hidden bg-zinc-800">
-            <img src={mediaUrl(cover)} alt="" className="size-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" />
+            <SafeImage src={cover} className="size-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" />
             {review.photos.length > 1 && (
               <span className="absolute right-3 top-3 rounded-md bg-black/70 px-2 py-0.5 text-xs">+{review.photos.length - 1}</span>
             )}

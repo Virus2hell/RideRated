@@ -1,10 +1,18 @@
 import { useReviews } from '../../lib/queries';
 import ReviewCard from './ReviewCard';
 import Spinner from '../ui/Spinner';
+import InfiniteScroll from '../ui/InfiniteScroll';
 
-// Infinite list of reviews with a "Load more" button (cursor pagination from the API).
-export default function ReviewList({ filters, showRoad = true, empty = 'No reviews yet.', columns = 'sm:grid-cols-2' }) {
-  const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } = useReviews(filters);
+// Reviews in a grid (3 per row on wide screens). More load automatically as you scroll.
+export default function ReviewList({
+  filters,
+  showRoad = true,
+  empty = 'No reviews yet.',
+  columns = 'sm:grid-cols-2 lg:grid-cols-3',
+  limit = 12, // 12 = 4 full rows of 3
+  infinite = true, // false = show just the first page (e.g. the home page preview)
+}) {
+  const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } = useReviews(filters, limit);
 
   if (isLoading) return <Spinner label="Loading reviews…" />;
   if (isError) return <p className="py-8 text-center text-red-400">Couldn't load reviews.</p>;
@@ -14,15 +22,16 @@ export default function ReviewList({ filters, showRoad = true, empty = 'No revie
 
   return (
     <div>
-      <div className={`grid gap-5 ${columns}`}>
+      <div className={`grid items-start gap-5 ${columns}`}>
         {reviews.map((r) => <ReviewCard key={r.id} review={r} showRoad={showRoad} />)}
       </div>
-      {hasNextPage && (
-        <div className="mt-8 text-center">
-          <button onClick={() => fetchNextPage()} disabled={isFetchingNextPage} className="btn-ghost">
-            {isFetchingNextPage ? 'Loading…' : 'Load more'}
-          </button>
-        </div>
+      {infinite && (
+        <InfiniteScroll
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          fetchNextPage={fetchNextPage}
+          endMessage={data.pages.length > 1 ? "You're all caught up" : null}
+        />
       )}
     </div>
   );

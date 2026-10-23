@@ -66,7 +66,7 @@ export default function RoadDetail() {
           <div className="road-divider my-8 opacity-40" />
 
           <h2 className="mb-4 font-display text-4xl tracking-wide">Rider reviews</h2>
-          <ReviewList filters={{ roadId: road.id }} showRoad={false} columns="grid-cols-1" />
+          <ReviewList filters={{ roadId: road.id }} showRoad={false} columns="sm:grid-cols-2" />
         </div>
 
         <aside className="space-y-5 lg:sticky lg:top-20 lg:self-start">

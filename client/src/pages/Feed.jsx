@@ -10,7 +10,7 @@ export default function Feed() {
   const active = user ? feed : 'all';
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
+    <div className="mx-auto max-w-6xl px-4 py-8">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <h1 className="font-display text-6xl leading-none tracking-wide">Review feed</h1>
@@ -40,7 +40,6 @@ export default function Feed() {
       <ReviewList
         key={active}
         filters={{ feed: active }}
-        columns="grid-cols-1"
         empty={
           active === 'following'
             ? "No reviews from riders you follow yet. Use Search riders to find people to follow."

@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
-import { api, mediaUrl } from '../lib/api';
+import { api } from '../lib/api';
 import { useReview } from '../lib/queries';
 import { formatDate, timeAgo } from '../lib/format';
 import { RATING_CATEGORIES, SEASONS } from '../lib/constants';
 import Avatar from '../components/ui/Avatar';
+import SafeImage from '../components/ui/SafeImage';
 import UserLink from '../components/ui/UserLink';
 import FollowButton from '../components/profile/FollowButton';
 import StarRating from '../components/ui/StarRating';
@@ -59,12 +60,12 @@ export default function ReviewDetail() {
 
       {review.photos.length > 0 && (
         <div className="mt-6">
-          <img src={mediaUrl(review.photos[activePhoto])} alt="" className="aspect-[16/10] w-full rounded-2xl object-cover" />
+          <SafeImage key={activePhoto} src={review.photos[activePhoto]} className="aspect-[16/10] w-full rounded-2xl object-cover" />
           {review.photos.length > 1 && (
             <div className="mt-3 flex gap-2">
               {review.photos.map((p, i) => (
                 <button key={p} onClick={() => setActivePhoto(i)} className={`size-16 overflow-hidden rounded-lg border-2 ${i === activePhoto ? 'border-brand-500' : 'border-transparent opacity-60'}`}>
-                  <img src={mediaUrl(p)} alt="" className="size-full object-cover" />
+                  <SafeImage src={p} className="size-full object-cover" />
                 </button>
               ))}
             </div>
