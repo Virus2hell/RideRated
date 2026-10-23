@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../context/AuthContext';
 import { api, errorMessage } from '../../lib/api';
+import { compressImages } from '../../lib/compressImage';
 import Modal from '../ui/Modal';
 import { CameraIcon } from '../ui/Icons';
 
@@ -18,10 +19,10 @@ export default function NewPostModal({ onClose }) {
   useEffect(() => () => previews.forEach(URL.revokeObjectURL), [previews]);
 
   const share = useMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
       const body = new FormData();
       body.append('caption', caption);
-      photos.forEach((p) => body.append('photos', p));
+      (await compressImages(photos)).forEach((p) => body.append('photos', p));
       return api.post('/posts', body);
     },
     onSuccess: () => {

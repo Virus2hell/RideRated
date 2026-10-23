@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
 import { api, errorMessage, fieldErrors, mediaUrl } from '../lib/api';
+import { compressImage } from '../lib/compressImage';
 import Avatar from '../components/ui/Avatar';
 import FormField from '../components/ui/FormField';
 import { CameraIcon, InstagramIcon, YouTubeIcon } from '../components/ui/Icons';
@@ -44,7 +45,7 @@ export default function EditProfile() {
       for (const [field, file] of [['avatar', avatarFile], ['banner', bannerFile]]) {
         if (!file) continue;
         const body = new FormData();
-        body.append(field, file);
+        body.append(field, await compressImage(file, { maxSide: field === 'avatar' ? 512 : 1920 }));
         updated = (await api.post(`/users/me/${field}`, body)).data.user;
       }
       return updated;

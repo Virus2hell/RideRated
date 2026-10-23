@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../context/AuthContext';
 import { api, errorMessage, mediaUrl } from '../../lib/api';
+import { compressImage } from '../../lib/compressImage';
 import { CameraIcon } from '../ui/Icons';
 
 // Banner image across the top of a profile (like LinkedIn / YouTube).
@@ -10,9 +11,9 @@ export default function ProfileBanner({ user, isMe }) {
   const queryClient = useQueryClient();
 
   const upload = useMutation({
-    mutationFn: (file) => {
+    mutationFn: async (file) => {
       const body = new FormData();
-      body.append('banner', file);
+      body.append('banner', await compressImage(file));
       return api.post('/users/me/banner', body).then((r) => r.data.user);
     },
     onSuccess: (updated) => {

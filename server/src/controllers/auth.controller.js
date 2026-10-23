@@ -29,7 +29,9 @@ function setAuthCookie(res, userId) {
   res.cookie(AUTH_COOKIE, token, {
     httpOnly: true, // not readable from JS, protects against XSS token theft
     secure: isProd,
-    sameSite: isProd ? 'none' : 'lax', // 'none' needed when client and API are on different domains
+    // 'lax' works because in production Vercel forwards /api to Render, so the browser sees ONE site
+    // (no third-party cookies, which Safari and Chrome block).
+    sameSite: 'lax',
     maxAge: TOKEN_TTL_DAYS * 24 * 60 * 60 * 1000,
   });
 }
@@ -73,7 +75,7 @@ export async function login(req, res) {
 }
 
 export function logout(_req, res) {
-  res.clearCookie(AUTH_COOKIE, { httpOnly: true, secure: isProd, sameSite: isProd ? 'none' : 'lax' });
+  res.clearCookie(AUTH_COOKIE, { httpOnly: true, secure: isProd, sameSite: 'lax' });
   res.status(204).end();
 }
 

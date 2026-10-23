@@ -1,13 +1,20 @@
 import pg from 'pg';
-import { env, isProd } from '../config/env.js';
+import { env } from '../config/env.js';
 
 // Return DATE columns as plain 'YYYY-MM-DD' strings. By default pg turns them into JS Dates at
 // local midnight, which can shift the day by one depending on the server's timezone.
 pg.types.setTypeParser(pg.types.builtins.DATE, (value) => value);
 
+// Local Postgres: no SSL. Hosted Postgres (Supabase, Neon…): SSL on.
+// We drop any ?sslmode=... from the URL so this setting always wins.
+const url = new URL(env.DATABASE_URL);
+const isLocalDb = ['localhost', '127.0.0.1', '::1'].includes(url.hostname);
+url.searchParams.delete('sslmode');
+
 export const pool = new pg.Pool({
-  connectionString: env.DATABASE_URL,
-  ssl: isProd ? { rejectUnauthorized: false } : false,
+  connectionString: url.toString(),
+  ssl: isLocalDb ? false : { rejectUnauthorized: false },
+  max: 10,
 });
 
 // If Postgres drops an idle connection (PC sleep, Postgres restart, network blip), pg emits an

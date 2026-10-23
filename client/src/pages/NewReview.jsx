@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api, errorMessage, fieldErrors } from '../lib/api';
+import { compressImages } from '../lib/compressImage';
 import { useRoad } from '../lib/queries';
 import { RATING_CATEGORIES, SEASONS } from '../lib/constants';
 import RoadPicker from '../components/review/RoadPicker';
@@ -68,7 +69,7 @@ export default function NewReview() {
   };
 
   const submit = useMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
       const data = {
         ...(road ? { roadId: road.id } : { road: newRoad }),
         title: form.title,
@@ -82,7 +83,7 @@ export default function NewReview() {
       }
       const body = new FormData();
       body.append('data', JSON.stringify(data));
-      photos.forEach((p) => body.append('photos', p));
+      (await compressImages(photos)).forEach((p) => body.append('photos', p));
       return api.post('/reviews', body).then((r) => r.data);
     },
     onSuccess: ({ id }) => {
