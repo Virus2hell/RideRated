@@ -16,7 +16,12 @@ export function mediaUrl(url) {
 
 // Pull a readable message out of an API error.
 export function errorMessage(err) {
-  return err?.response?.data?.error ?? 'Something went wrong. Please try again.';
+  const status = err?.response?.status;
+  // 502/503/504 = the free server is waking up (it sleeps after 15 min without visitors)
+  if (!err?.response || [502, 503, 504].includes(status)) {
+    return 'The server is waking up. Please try again in about 30 seconds.';
+  }
+  return err.response.data?.error ?? 'Something went wrong. Please try again.';
 }
 
 // Field-level validation errors from the API, e.g. { email: ['Invalid email address'] }
