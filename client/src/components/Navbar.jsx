@@ -55,8 +55,12 @@ function UserMenu({ user, onLogout }) {
 }
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
+  const { user, logout, login, register } = useAuth();
   const [open, setOpen] = useState(false);
+  // While a login/sign-up request is running, the Log in / Join links are disabled
+  // so the rider can't jump to the other form halfway through.
+  const authBusy = login.isPending || register.isPending;
+  const busyLink = 'pointer-events-none cursor-not-allowed opacity-40';
 
   return (
     <header className="sticky top-0 z-[1000] border-b border-zinc-800/80 bg-asphalt/85 backdrop-blur-md">
@@ -77,8 +81,8 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <NavLink to="/login" className={navClass}>Log in</NavLink>
-              <Link to="/register" className="btn-primary">Join the pack</Link>
+              <NavLink to="/login" className={(p) => `${navClass(p)} ${authBusy ? busyLink : ''}`} aria-disabled={authBusy} tabIndex={authBusy ? -1 : undefined}>Log in</NavLink>
+              <Link to="/register" className={`btn-primary ${authBusy ? busyLink : ''}`} aria-disabled={authBusy} tabIndex={authBusy ? -1 : undefined}>Join the pack</Link>
             </>
           )}
         </div>
@@ -101,8 +105,8 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link to="/login" className="block py-2 text-zinc-300">Log in</Link>
-              <Link to="/register" className="block py-2 font-semibold text-brand-400">Join the pack</Link>
+              <Link to="/login" className={`block py-2 text-zinc-300 ${authBusy ? busyLink : ''}`} aria-disabled={authBusy}>Log in</Link>
+              <Link to="/register" className={`block py-2 font-semibold text-brand-400 ${authBusy ? busyLink : ''}`} aria-disabled={authBusy}>Join the pack</Link>
             </>
           )}
         </div>
